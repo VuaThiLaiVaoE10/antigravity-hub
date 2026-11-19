@@ -31,14 +31,17 @@ jobs:
           set -o pipefail
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platform-tools" "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0"
 
-      - name: Prepare environment & debug signing keystore
+            - name: Prepare environment & debug signing keystore
         env:
           DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           [ -f .env ] || cp .env.example .env
+          if [ -n "$GOOGLE_SERVICES_JSON" ] && [ ! -f app/google-services.json ]; then
+            printf '%s\n' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          fi
           if [ ! -f app/google-services.json ]; then
-            echo "::error::Missing app/google-services.json in repository! Make sure it was pushed from AI Studio."
-            exit 1
+            echo "::warning::app/google-services.json not found; building with googleServices.missing.passthrough=true."
           fi
           if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
             echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > debug.keystore
