@@ -61,18 +61,28 @@ import com.example.ui.theme.LocalTelemetryColors
 
 @Composable
 fun AuthScreen(
-    onAuthSuccess: () -> Unit
+    onAuthSuccess: () -> Unit,
+    missingFirebaseConfig: Boolean = false
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val credentialManager = remember(context) { CredentialManager.create(context) }
     val telemetry = LocalTelemetryColors.current
 
-    var isCheckingSilentAuth by remember { mutableStateOf(true) }
+    var isCheckingSilentAuth by remember { mutableStateOf(!missingFirebaseConfig) }
     var isSigningIn by remember { mutableStateOf(false) }
-    var authError by remember { mutableStateOf<String?>(null) }
+    var authError by remember {
+        mutableStateOf(
+            if (missingFirebaseConfig) {
+                "Firebase is not configured in this build (missing google-services.json). Add GOOGLE_SERVICES_JSON to GitHub Secrets and rebuild."
+            } else {
+                null
+            }
+        )
+    }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(missingFirebaseConfig) {
+        if (missingFirebaseConfig) return@LaunchedEffect
         attemptAutoSignIn(
             context = context,
             credentialManager = credentialManager,
@@ -218,7 +228,7 @@ fun AuthScreen(
                         }
                     )
                 },
-                enabled = !isSigningIn && !isCheckingSilentAuth,
+                enabled = !missingFirebaseConfig && !isSigningIn && !isCheckingSilentAuth,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)

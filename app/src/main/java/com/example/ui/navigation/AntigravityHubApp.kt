@@ -76,6 +76,7 @@ import com.example.ui.viewmodel.DataUiState
 import com.example.ui.viewmodel.DeepReviewViewModel
 import com.example.ui.viewmodel.MissionControlViewModel
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -103,8 +104,22 @@ private val TopLevelDestinations = listOf(
 )
 
 @Composable
-fun AntigravityHubApp(auth: FirebaseAuth = Firebase.auth) {
-    val currentUser by auth.authStateFlow().collectAsStateWithLifecycle(initialValue = auth.currentUser)
+fun AntigravityHubApp(auth: FirebaseAuth? = null) {
+    val context = LocalContext.current
+    val resolvedAuth = remember(auth, context) {
+        auth ?: runCatching {
+            if (FirebaseApp.getApps(context).isNotEmpty()) Firebase.auth else null
+        }.getOrNull()
+    }
+    if (resolvedAuth == null) {
+        AuthScreen(
+            onAuthSuccess = {},
+            missingFirebaseConfig = true
+        )
+        return
+    }
+
+    val currentUser by resolvedAuth.authStateFlow().collectAsStateWithLifecycle(initialValue = resolvedAuth.currentUser)
     val user = currentUser
 
     if (user == null) {
