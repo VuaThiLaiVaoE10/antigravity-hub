@@ -1,0 +1,6 @@
+{
+  "name": "Antigravity Hub",
+  "description": "Mission-control Android companion for Antigravity with Firebase Firestore cloud relay, live telemetry, remote approvals, steering controls, and Gemini 4 Carbon high-thinking code review.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

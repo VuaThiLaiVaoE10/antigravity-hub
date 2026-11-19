@@ -1,0 +1,327 @@
+{
+  "entities": {
+    "Workspace": {
+      "title": "Workspace",
+      "description": "A registered Antigravity local workstation or cloud sandbox connected via the Firestore cloud relay.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this workspace."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable workspace display name."
+        },
+        "hostName": {
+          "type": "string",
+          "description": "Machine hostname or cloud sandbox identifier."
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["LOCAL_WORKSTATION", "CLOUD_SANDBOX"],
+          "description": "Execution environment type."
+        },
+        "repository": {
+          "type": "string",
+          "description": "Repository or workspace path."
+        },
+        "branch": {
+          "type": "string",
+          "description": "Active Git branch name."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ONLINE", "IDLE", "OFFLINE"],
+          "description": "Live relay heartbeat status."
+        },
+        "lastHeartbeatAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest heartbeat (FieldValue.serverTimestamp())."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last-updated timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "hostName",
+        "environment",
+        "repository",
+        "branch",
+        "status",
+        "lastHeartbeatAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AgentTask": {
+      "title": "AgentTask",
+      "description": "An autonomous Antigravity agent run tracked in real time.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this task."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "ID of the parent Workspace document."
+        },
+        "title": {
+          "type": "string",
+          "description": "Concise task title."
+        },
+        "objective": {
+          "type": "string",
+          "description": "Full prompt or objective assigned to the agent."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["RUNNING", "PAUSED", "AWAITING_APPROVAL", "COMPLETED", "FAILED", "STOPPED"],
+          "description": "Current lifecycle state of the agent run."
+        },
+        "currentPhase": {
+          "type": "string",
+          "description": "Current execution phase label."
+        },
+        "activeTool": {
+          "type": "string",
+          "enum": ["EDITOR", "TERMINAL", "BROWSER", "PLANNER"],
+          "description": "Tool currently active in the agent runtime."
+        },
+        "progressPercent": {
+          "type": "integer",
+          "description": "Completion percentage from 0 to 100."
+        },
+        "summary": {
+          "type": "string",
+          "description": "Latest concise status summary from the agent."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last-updated timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "workspaceId",
+        "title",
+        "objective",
+        "status",
+        "currentPhase",
+        "activeTool",
+        "progressPercent",
+        "summary",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ApprovalRequest": {
+      "title": "ApprovalRequest",
+      "description": "A human-in-the-loop gate for an implementation plan, code diff, or terminal command.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this approval request."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "ID of the associated Workspace."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "ID of the parent AgentTask."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["PLAN", "CODE_DIFF", "TERMINAL_COMMAND"],
+          "description": "Category of artifact awaiting human review."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short title describing the proposed action or artifact."
+        },
+        "description": {
+          "type": "string",
+          "description": "Context explaining why the agent requested approval."
+        },
+        "payload": {
+          "type": "string",
+          "description": "Plan markdown, unified code diff, or shell command body."
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH"],
+          "description": "Risk rating for the proposed action."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PENDING", "APPROVED", "REJECTED"],
+          "description": "Decision state of the approval gate."
+        },
+        "decisionNote": {
+          "type": "string",
+          "description": "Optional rationale provided when approving or rejecting."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last-updated timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "workspaceId",
+        "taskId",
+        "type",
+        "title",
+        "description",
+        "payload",
+        "riskLevel",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ControlCommand": {
+      "title": "ControlCommand",
+      "description": "An outbound remote control or steering command queued for the Antigravity relay bridge.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID issuing the command."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Target Workspace document ID."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Target AgentTask document ID."
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "PAUSE",
+            "RESUME",
+            "STOP",
+            "STEER_PROMPT",
+            "APPROVE_ARTIFACT",
+            "REJECT_ARTIFACT",
+            "START_TASK"
+          ],
+          "description": "Remote control verb."
+        },
+        "payload": {
+          "type": "string",
+          "description": "Prompt text, artifact ID, or decision note."
+        },
+        "deliveryStatus": {
+          "type": "string",
+          "enum": ["QUEUED", "ACKNOWLEDGED", "EXECUTED"],
+          "description": "Relay delivery acknowledgement state."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last-updated timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "workspaceId",
+        "taskId",
+        "action",
+        "payload",
+        "deliveryStatus",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LogEntry": {
+      "title": "LogEntry",
+      "description": "An append-only timeline milestone or terminal log line emitted during an agent task.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning the log stream."
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Parent AgentTask document ID."
+        },
+        "level": {
+          "type": "string",
+          "enum": ["INFO", "STEP", "WARN", "ERROR", "COMMAND"],
+          "description": "Severity or event classification."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["AGENT", "TERMINAL", "BROWSER", "SYSTEM"],
+          "description": "Subsystem producing the event."
+        },
+        "message": {
+          "type": "string",
+          "description": "Terminal line or step timeline message."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["userId", "taskId", "level", "source", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workspaces/{workspaceId}": {
+      "schema": { "$ref": "#/entities/Workspace" },
+      "description": "Per-user registered Antigravity workspaces."
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/AgentTask" },
+      "description": "Per-user Antigravity autonomous agent tasks."
+    },
+    "/users/{userId}/approvals/{approvalId}": {
+      "schema": { "$ref": "#/entities/ApprovalRequest" },
+      "description": "Per-user pending and decided plan, diff, and terminal approvals."
+    },
+    "/users/{userId}/commands/{commandId}": {
+      "schema": { "$ref": "#/entities/ControlCommand" },
+      "description": "Per-user outbound remote control and steering command queue."
+    },
+    "/users/{userId}/logs/{logId}": {
+      "schema": { "$ref": "#/entities/LogEntry" },
+      "description": "Per-user live timeline and terminal log stream entries."
+    }
+  }
+}
