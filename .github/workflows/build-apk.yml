@@ -2,9 +2,6 @@ name: Build & Publish Android APK
 
 on:
   push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
 
 permissions:
@@ -24,6 +21,14 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+
+      - name: Set up Android SDK & accept licenses
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 36 SDK licenses and components
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platform-tools" "platforms;android-36.1" "build-tools;36.0.0" || true
 
       - name: Prepare debug signing keystore
         env:
@@ -45,7 +50,7 @@ jobs:
               -keysize 2048 \
               -validity 10000 \
               -dname "CN=Android Debug,O=Android,C=US"
-            echo "Generated runner debug.keystore. Register its SHA-1/SHA-256 in Firebase Console if Google Sign-In is used:"
+            echo "Generated runner debug.keystore. Add these fingerprints in Firebase Console for Google Sign-In:"
             keytool -list -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -E "SHA1:|SHA256:" || true
           fi
 
@@ -55,7 +60,7 @@ jobs:
           gradle-version: "9.3.1"
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Prepare APK filename
         run: |
