@@ -107,8 +107,6 @@ fun onGoogleSignInClicked(
         onAuthError("Google Sign-In configuration missing: default_web_client_id not found.")
         return
     }
-    }
-    }
     val signInOption = GetSignInWithGoogleOption.Builder(serverClientId = clientId).build()
     val request = GetCredentialRequest.Builder()
         .addCredentialOption(signInOption)
