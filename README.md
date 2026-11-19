@@ -68,11 +68,14 @@ FIRESTORE_EMULATOR_HOST="127.0.0.1:8085" node --test firestore.test.js
 
 ## Distributing via Direct `.apk` (GitHub Releases) or Google Play
 
-1. **Direct `.apk` Sharing (GitHub Releases)**:
+1. **Automated GitHub Releases APK (Included via GitHub Actions)**:
+   - Every push to `main` (or manual run under **Actions → Build & Publish Android APK**) automatically compiles `AntigravityHub-latest.apk` and publishes it to the **`latest`** Release.
+   - On your Android phone, open `https://github.com/vuathilaivaoe10/<your-repo>/releases` (or direct download `.../releases/latest/download/AntigravityHub-latest.apk`), tap **`AntigravityHub-latest.apk`**, allow *Install unknown apps*, and install.
+   - *(Tip for Google Sign-In)*: To keep the same SHA-1 already registered in Firebase, add your base64-encoded `debug.keystore` as a repository secret named `DEBUG_KEYSTORE_BASE64`, or copy the SHA-1/SHA-256 printed in the Actions log into **Firebase Console → Project Settings → Your apps (Android)**.
+2. **Manual `.apk` Sharing**:
    - Generate the `.apk` (via AI Studio **Settings → Generate APK** or `gradle :app:assembleRelease`) and attach it to a new Release in your repository.
-   - If using a **Release keystore**, register its **SHA-1** and **SHA-256** fingerprints in **Firebase Console → Project Settings → Your apps (Android)** so Google Sign-In works on installed builds.
    - Release builds automatically use **reCAPTCHA Enterprise** (`recaptcha_site_key`) for Firebase App Check.
-2. **Google Play Store (`.aab`)**:
+3. **Google Play Store (`.aab`)**:
    - Export an Android App Bundle (`.aab`), enroll in Play App Signing, and register Play's App Signing SHA-1/SHA-256 certificates in Firebase Console.
 
 ---
