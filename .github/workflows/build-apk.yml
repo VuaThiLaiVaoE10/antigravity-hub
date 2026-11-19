@@ -25,21 +25,21 @@ jobs:
       - name: Accept Android SDK licenses & install Android 36.1
         run: |
           SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          echo "Using Android SDK at: $SDK_ROOT"
           SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -n 1)
-          if [ -z "$SDKMANAGER" ]; then
-            echo "sdkmanager not found under $SDK_ROOT/cmdline-tools"
-            exit 1
-          fi
           set +o pipefail
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses > /dev/null
           set -o pipefail
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platform-tools" "platforms;android-36.1" "build-tools;36.0.0"
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platform-tools" "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0"
 
-      - name: Prepare debug signing keystore
+      - name: Prepare environment & debug signing keystore
         env:
           DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
         run: |
+          [ -f .env ] || cp .env.example .env
+          if [ ! -f app/google-services.json ]; then
+            echo "::error::Missing app/google-services.json in repository! Make sure it was pushed from AI Studio."
+            exit 1
+          fi
           if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
             echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > debug.keystore
           elif [ -f debug.keystore.base64 ]; then
@@ -63,7 +63,7 @@ jobs:
           gradle-version: "9.3.1"
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx3g -Dfile.encoding=UTF-8" -Dorg.gradle.workers.max=2 --stacktrace
+        run: gradle :app:assembleDebug --no-daemon --console=plain -Dorg.gradle.jvmargs="-Xmx3g -Dfile.encoding=UTF-8" -Dorg.gradle.workers.max=2
 
       - name: Prepare APK filename
         run: |
