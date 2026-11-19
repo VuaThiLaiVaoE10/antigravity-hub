@@ -31,7 +31,7 @@ jobs:
           set -o pipefail
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platform-tools" "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0"
 
-            - name: Prepare environment & debug signing keystore
+      - name: Prepare environment & debug signing keystore
         env:
           DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
