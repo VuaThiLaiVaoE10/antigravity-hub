@@ -43,7 +43,15 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
     is ContextWrapper -> baseContext.findActivity()
     else -> null
 }
-
+private fun resolveDefaultWebClientId(context: Context): String? {
+    val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+    if (resId == 0) return null
+    return try {
+        context.getString(resId).takeIf { it.isNotBlank() }
+    } catch (_: Exception) {
+        null
+    }
+}
 fun attemptAutoSignIn(
     context: Context,
     credentialManager: CredentialManager,
