@@ -36,10 +36,8 @@ jobs:
         run: |
           if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
             echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > debug.keystore
-            echo "Restored debug.keystore from GitHub Secret."
           elif [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
-            echo "Restored debug.keystore from repository debug.keystore.base64."
           elif [ ! -f debug.keystore ]; then
             keytool -genkeypair -v \
               -keystore debug.keystore \
@@ -50,7 +48,6 @@ jobs:
               -keysize 2048 \
               -validity 10000 \
               -dname "CN=Android Debug,O=Android,C=US"
-            echo "Generated runner debug.keystore. Add these fingerprints in Firebase Console for Google Sign-In:"
             keytool -list -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -E "SHA1:|SHA256:" || true
           fi
 
@@ -78,13 +75,6 @@ jobs:
         with:
           tag_name: latest
           name: Antigravity Hub (Latest APK)
-          body: |
-            Automated Android APK build for **Antigravity Hub**.
-
-            **Install on Android:**
-            1. Tap **AntigravityHub-latest.apk** below to download.
-            2. Open the downloaded file and allow *Install unknown apps* if prompted.
-            3. Tap **Install**.
           make_latest: true
           files: |
             AntigravityHub-latest.apk
