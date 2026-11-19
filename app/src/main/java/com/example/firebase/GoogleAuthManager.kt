@@ -55,9 +55,7 @@ fun attemptAutoSignIn(
         onAuthSuccess()
         return
     }
-    val clientId = try {
-        context.getString(R.string.default_web_client_id)
-    } catch (_: Exception) {
+        val clientId = resolveDefaultWebClientId(context) ?: run {
         onUnauthenticated()
         return
     }
